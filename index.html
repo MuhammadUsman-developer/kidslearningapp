@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KiddoLearn - Math, English & Urdu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --math-color: #FF6B6B;
+            --english-color: #4ECDC4;
+            --urdu-color: #A29BFE;
+            --bg-color: #F0F2F5;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka One', cursive;
+            background-color: var(--bg-color);
+            overflow-x: hidden;
+        }
+
+        /* Hero Header */
+        header {
+            background: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--math-color), var(--english-color));
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Main Grid */
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        /* Subject Cards */
+        .card {
+            position: relative;
+            background: white;
+            border-radius: 30px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 8px solid transparent;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .card i { font-size: 4rem; margin-bottom: 20px; display: block; }
+        .card h2 { font-size: 2rem; margin: 10px 0; }
+        .card p { font-family: sans-serif; color: #666; font-weight: bold; }
+
+        /* Specific Subject Styles */
+        .math-card { border-color: var(--math-color); }
+        .math-card h2 { color: var(--math-color); }
+
+        .english-card { border-color: var(--english-color); }
+        .english-card h2 { color: var(--english-color); }
+
+        .urdu-card { border-color: var(--urdu-color); }
+        .urdu-card h2 { 
+            color: var(--urdu-color); 
+            font-family: 'Noto Nastaliq Urdu', serif;
+        }
+
+        /* Urdu Specific text style */
+        .urdu-text {
+            font-family: 'Noto Nastaliq Urdu', serif;
+            font-size: 2.2rem;
+            direction: rtl;
+        }
+
+        /* Action Buttons */
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-math { background: var(--math-color); }
+        .btn-english { background: var(--english-color); }
+        .btn-urdu { background: var(--urdu-color); }
+
+        .btn:hover { opacity: 0.8; }
+
+        /* Mascot/Decorative Circles */
+        .circle {
+            position: fixed;
+            z-index: -1;
+            border-radius: 50%;
+            filter: blur(50px);
+            opacity: 0.3;
+        }
+
+        /* Responsive UI */
+        @media (max-width: 600px) {
+            .logo { font-size: 1.8rem; }
+            .card { padding: 30px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="circle" style="width: 300px; height: 300px; background: var(--math-color); top: -50px; left: -50px;"></div>
+    <div class="circle" style="width: 250px; height: 250px; background: var(--english-color); bottom: 10px; right: -50px;"></div>
+
+    <header>
+        <div class="logo">🌟 KiddoLearn Academy</div>
+        <p style="font-family: sans-serif; color: #888;">Pick a subject and let's start playing!</p>
+    </header>
+
+    <div class="container">
+        <div class="card math-card" onclick="location.href='#math'">
+            <div style="font-size: 4rem;">➕</div>
+            <h2>Math Magic</h2>
+            <p>Numbers, Shapes & Fun Quizzes</p>
+            <a href="math.html" class="btn btn-math">Let's Count!</a>
+        </div>
+
+        <div class="card english-card" onclick="location.href='#english'">
+            <div style="font-size: 4rem;">🅰️</div>
+            <h2>English ABC</h2>
+            <p>Phonics, Words & Stories</p>
+            <a href="english.html" class="btn btn-english">Start ABC</a>
+        </div>
+
+        <div class="card urdu-card" onclick="location.href='#urdu'">
+            <div style="font-size: 4rem;">🍎</div>
+            <h2 class="urdu-text">اردو قاعدہ</h2>
+            <p>Alif Bey Pay & Vocabulary</p>
+            <a href="urdu.html" class="btn btn-urdu">شروع کریں</a>
+        </div>
+    </div>
+
+   <footer style="text-align:center; padding:20px; color:#aaa; font-family:sans-serif;">
+    <p>
+        ⭐ Stars: <span id="starCount">0</span> |
+        ✅ Lessons Done: <span id="lessonCount">0</span>
+    </p>
+</footer>
+
+    <script>
+        // Simple click sound effect simulation
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                // You can add logic here to navigate to your sub-apps
+                console.log("Navigating to: " + card.querySelector('h2').innerText);
+            });
+        });
+
+/* ========= STAR SYSTEM ========= */
+
+// Load saved progress
+let stars = parseInt(localStorage.getItem("stars")) || 0;
+let lessons = parseInt(localStorage.getItem("lessons")) || 0;
+
+// Update UI
+function updateUI() {
+    document.getElementById("starCount").innerText = stars;
+    document.getElementById("lessonCount").innerText = lessons;
+}
+
+// Add stars
+function addStars(count = 1) {
+    stars += count;
+    localStorage.setItem("stars", stars);
+    updateUI();
+}
+
+// Complete lesson
+function completeLesson() {
+    lessons++;
+    localStorage.setItem("lessons", lessons);
+    addStars(5); // ⭐ reward per lesson
+}
+
+// Initial load
+updateUI();
+
+/* ========= CARD CLICK EVENTS ========= */
+
+document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => {
+        completeLesson();
+    });
+});
+</script>
+</body>
+</html>
