@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Math Pro</title>
+    <style>
+        :root {
+            --primary: #6C5CE7;
+            --secondary: #00CEC9;
+            --success: #00B894;
+            --warning: #FDCB6E;
+            --danger: #D63031;
+            --bg: #F0F3F7;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: var(--bg);
+            color: #2D3436;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        /* App Header */
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .score-display {
+            font-size: 1rem;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        /* Main Container */
+        .app-container {
+            padding: 20px;
+            padding-bottom: 80px; /* Space for bottom nav */
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Grid Menu */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            border-bottom: 4px solid #ddd;
+        }
+
+        .menu-item:active { transform: scale(0.95); }
+
+        .menu-item.plus { border-color: var(--success); }
+        .menu-item.minus { border-color: var(--danger); }
+        .menu-item.times { border-color: var(--warning); }
+        .menu-item.divide { border-color: var(--primary); }
+
+        .icon-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        /* Sections */
+        .section { display: none; animation: slideIn 0.3s ease-out; }
+        .active { display: block; }
+
+        @keyframes slideIn {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Math Display */
+        .math-card {
+            background: white;
+            border-radius: 30px;
+            padding: 40px 20px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .visual-aid { font-size: 2.5rem; margin-bottom: 20px; letter-spacing: 5px; }
+        .equation { font-size: 3.5rem; font-weight: 900; margin: 10px 0; color: var(--primary); }
+
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .num-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 20px;
+            font-size: 1.5rem;
+            border-radius: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .num-btn:active { background: var(--primary); color: white; }
+
+        /* Writing Canvas */
+        #writingCanvas {
+            background: #fff;
+            border: 3px dashed var(--primary);
+            border-radius: 20px;
+            touch-action: none;
+            width: 100%;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-item { border: none; background: none; color: #636e72; font-size: 0.8rem; }
+        .nav-item.active { color: var(--primary); }
+
+        .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #ff6b6b, #feca57);
+    padding: 12px 16px;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Logo */
+.logo {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Navigation */
+.header-nav {
+    display: flex;
+    gap: 10px;
+}
+
+.header-nav a{
+     list-style: none;
+    text-decoration: none;
+}
+
+.logo a{
+     list-style: none;
+    text-decoration: none;
+} 
+
+.nav-item {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.nav-item:hover {
+    background: rgba(255,255,255,0.35);
+}
+
+.nav-item.active {
+    background: white;
+    color: #ff6b6b;
+}
+
+/* Stars */
+.header-right {
+    background: rgba(255,255,255,0.25);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    .app-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+<header class="app-header">
+    <div class="header-left">
+        <span class="logo"><a href="books.html">🌟 KiddoLearn Academy</a></span>
+    </div>
+
+    <nav class="header-nav">
+        <button class="nav-item active" onclick="selectSubject(this)"><a href="math.html">➕ Math</a></button>
+        <button class="nav-item" onclick="selectSubject(this)"><a href="english.html">🔤 English</a></button>
+        <button class="nav-item" onclick="selectSubject(this)"><a href="urdu.html">📖 Urdu</a></button>
+    </nav>
+
+    <div class="header-right">
+        ⭐ Stars: <span id="star-count">0</span>
+    </div>
+</header>
+
+
+<div class="app-container">
+    
+    <div id="home" class="section active">
+        <h2 style="text-align:center">What shall we learn?</h2>
+        <div class="menu-grid">
+            <div class="menu-item" onclick="startLearn('counting')"><div class="icon-circle" style="background:#E1F5FE">🔢</div>Counting</div>
+            <div class="menu-item" onclick="startLearn('tables')"><div class="icon-circle" style="background:#FFF9C4">✖️</div>Tables</div>
+            <div class="menu-item plus" onclick="startQuiz('+')"><div class="icon-circle" style="background:#C8E6C9">➕</div>Addition</div>
+            <div class="menu-item minus" onclick="startQuiz('-')"><div class="icon-circle" style="background:#FFCDD2">➖</div>Subtraction</div>
+            <div class="menu-item times" onclick="startQuiz('*')"><div class="icon-circle" style="background:#FFE0B2">✖️</div>Multiplication</div>
+            <div class="menu-item divide" onclick="startQuiz('/')"><div class="icon-circle" style="background:#E1BEE7">➗</div>Division</div>
+        </div>
+    </div>
+
+    <div id="quiz-section" class="section">
+        <div class="math-card">
+            <div id="visuals" class="visual-aid">🍎🍎 + 🍎</div>
+            <div id="question-text" class="equation">2 + 1 = ?</div>
+            <input type="number" id="ans-input" readonly style="width:100%; border:none; text-align:center; font-size:2rem; color:var(--primary)" placeholder="Tap Numbers Below">
+        </div>
+        <div class="numpad">
+            <button class="num-btn" onclick="press(1)">1</button><button class="num-btn" onclick="press(2)">2</button><button class="num-btn" onclick="press(3)">3</button>
+            <button class="num-btn" onclick="press(4)">4</button><button class="num-btn" onclick="press(5)">5</button><button class="num-btn" onclick="press(6)">6</button>
+            <button class="num-btn" onclick="press(7)">7</button><button class="num-btn" onclick="press(8)">8</button><button class="num-btn" onclick="press(9)">9</button>
+            <button class="num-btn" onclick="press('CLR')" style="color:var(--danger)">C</button>
+            <button class="num-btn" onclick="press(0)">0</button>
+            <button class="num-btn" onclick="checkAnswer()" style="background:var(--success); color:white">OK</button>
+        </div>
+    </div>
+
+    <div id="writing-section" class="section">
+        <h2 id="writing-target">Trace the Number 1</h2>
+        <canvas id="writingCanvas" width="320" height="350"></canvas>
+        <div style="margin-top:15px">
+            <button onclick="clearCanvas()" class="num-btn" style="width:45%">Clear</button>
+            <button onclick="speak('Great job drawing!')" class="num-btn" style="width:45%; background:var(--primary); color:white">Done</button>
+        </div>
+    </div>
+
+    <div id="counting-section" class="section">
+        <div id="counting-grid" style="display:grid; grid-template-columns: repeat(5,1fr); gap:5px"></div>
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <button class="nav-item active" onclick="showPage('home')">🏠<br>Home</button>
+    <button class="nav-item" onclick="startLearn('writing')">✏️<br>Write</button>
+    <button class="nav-item" onclick="startLearn('counting')">🔢<br>Count</button>
+</div>
+
+<script>
+    let stars = 0;
+    let currentAns = 0;
+    let currentOp = '+';
+
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.pitch = 1.2;
+        window.speechSynthesis.speak(msg);
+    }
+
+function selectSubject(btn) {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+
+
+    function showPage(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(id + (id.includes('section') ? '' : '')).classList.add('active');
+        if(id !== 'quiz-section') document.getElementById('ans-input').value = '';
+    }
+
+    // Quiz Logic
+    function startQuiz(op) {
+        currentOp = op;
+        showPage('quiz-section');
+        generateQuestion();
+    }
+
+    function generateQuestion() {
+        let a = Math.floor(Math.random() * 10) + 1;
+        let b = Math.floor(Math.random() * 10) + 1;
+        
+        if(currentOp === '-') { if(a < b) [a,b] = [b,a]; }
+        if(currentOp === '/') { a = b * (Math.floor(Math.random() * 5) + 1); }
+        
+        currentAns = eval(`${a}${currentOp}${b}`);
+        
+        let symbols = ['🍎','⭐','🦁','🍭','🎨'];
+        let sym = symbols[Math.floor(Math.random()*symbols.length)];
+        
+        document.getElementById('visuals').innerHTML = sym.repeat(a) + " " + (currentOp==='*'?'×':currentOp==='/'?'÷':currentOp) + " " + sym.repeat(b);
+        document.getElementById('question-text').innerText = `${a} ${currentOp==='*'?'×':currentOp==='/'?'÷':currentOp} ${b} = ?`;
+        speak(`${a} ${currentOp==='*'?'times':currentOp==='/'?'divided by':currentOp==='+'?'plus':'minus'} ${b}`);
+    }
+
+    function press(val) {
+        let input = document.getElementById('ans-input');
+        if(val === 'CLR') input.value = '';
+        else input.value += val;
+    }
+
+    function checkAnswer() {
+        let userVal = document.getElementById('ans-input').value;
+        if(parseInt(userVal) === currentAns) {
+            stars += 10;
+            document.getElementById('star-count').innerText = stars;
+            speak("Excellent! You got a star!");
+            generateQuestion();
+            document.getElementById('ans-input').value = '';
+        } else {
+            speak("Oops, try again!");
+            document.getElementById('ans-input').value = '';
+        }
+    }
+
+    // Counting Section
+    function startLearn(type) {
+        if(type === 'counting') {
+            const grid = document.getElementById('counting-grid');
+            grid.innerHTML = '';
+            for(let i=1; i<=100; i++) {
+                let d = document.createElement('div');
+                d.className = 'num-btn';
+                d.style.padding = '10px';
+                d.innerText = i;
+                d.onclick = () => { speak(i); d.style.background = '#00CEC9'; };
+                grid.appendChild(d);
+            }
+            showPage('counting-section');
+        } else if(type === 'writing') {
+            showPage('writing-section');
+            initCanvas();
+        }
+    }
+
+    // Canvas Logic
+    function initCanvas() {
+        const canvas = document.getElementById('writingCanvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        const getXY = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return [clientX - rect.left, clientY - rect.top];
+        }
+
+        const start = (e) => { drawing = true; ctx.beginPath(); const [x,y] = getXY(e); ctx.moveTo(x,y); };
+        const move = (e) => { 
+            if(!drawing) return; 
+            const [x,y] = getXY(e); 
+            ctx.lineTo(x,y); 
+            ctx.lineWidth = 15; 
+            ctx.lineCap = 'round'; 
+            ctx.strokeStyle = '#6C5CE7'; 
+            ctx.stroke(); 
+        };
+        const stop = () => drawing = false;
+
+        canvas.onmousedown = start; canvas.onmousemove = move; canvas.onmouseup = stop;
+        canvas.ontouchstart = start; canvas.ontouchmove = move; canvas.ontouchend = stop;
+    }
+
+    function clearCanvas() {
+        const canvas = document.getElementById('writingCanvas');
+        canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+    }
+</script>
+</body>
+</html>

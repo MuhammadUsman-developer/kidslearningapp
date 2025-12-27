@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بچوں کی اردو سیکھنے کی ایپ</title>
+    <style>
+        :root {
+            --bg: #fdfcf0; --primary: #ff6b6b; --secondary: #4ecdc4;
+            --accent: #ffe66d; --text: #2d3436; --card-bg: #ffffff;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg); margin: 0; color: var(--text); overflow-x: hidden;
+        }
+
+        /* Responsive Header */
+        header {
+            background: var(--primary); color: white; padding: 15px;
+            text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: sticky; top: 0; z-index: 100;
+        }
+
+        /* Navigation Scroller */
+        nav {
+            display: flex; overflow-x: auto; 
+            padding: 10px; gap: 10px;
+        }
+        nav::-webkit-scrollbar { display: none; }
+        .nav-btn {
+            padding: 10px 20px; border: none; border-radius: 25px;
+            background: var(--secondary); color: white; font-weight: bold;
+            cursor: pointer; white-space: nowrap; transition: 0.3s;
+        }
+        .nav-btn.active { background: var(--primary); transform: scale(1.1); }
+
+        /* Content Grid */
+        #app-viewport { padding: 20px; max-width: 1200px; margin: auto; }
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 20px; animation: fadeIn 0.5s ease;
+        }
+
+        /* Card Design */
+        .card {
+            background: var(--card-bg); border-radius: 20px; padding: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08); text-align: center;
+            transition: 0.2s; cursor: pointer; border: 3px solid transparent;
+        }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent); }
+        .card img { width: 100%; height: 100px; object-fit: contain; margin-bottom: 10px; }
+        .card h3 { margin: 5px 0; font-size: 1.2rem; text-transform: capitalize; }
+
+        /* Writing Canvas */
+        #writing-zone { text-align: center; background: white; padding: 20px; border-radius: 20px; }
+        canvas { background: #f9f9f9; border: 3px dashed var(--secondary); border-radius: 10px; touch-action: none; cursor: crosshair; }
+        
+        /* Quiz Styles */
+        .quiz-container { background: white; padding: 30px; border-radius: 20px; text-align: center; }
+        .option-btn { 
+            display: block; width: 100%; padding: 15px; margin: 10px 0; 
+            border: 2px solid var(--secondary); border-radius: 10px; background: none;
+            font-size: 1.1rem; cursor: pointer;
+        }
+        .option-btn:hover { background: var(--secondary); color: white; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none; }
+
+        /* Section-based Card Colors */
+.card.alphabets { background:#fff3e0; }
+.card.colors { background:#e3f2fd; }
+.card.animals { background:#e8f5e9; }
+.card.fruits { background:#fffde7; }
+.card.vegetables { background:#f1f8e9; }
+.card.body { background:#fce4ec; }
+.card.days, .card.months { background:#ede7f6; }
+
+.card .emoji {
+    font-size:64px;
+    margin-bottom:10px;
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #ff6b6b, #feca57);
+    padding: 12px 16px;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Logo */
+.logo {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Navigation */
+.header-nav {
+    display: flex;
+    gap: 10px;
+    background-color: none;
+}
+
+.nav-item {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.header-nav a{
+     list-style: none;
+    text-decoration: none;
+}
+
+.logo a{
+     list-style: none;
+    text-decoration: none;
+} 
+
+.nav-item:hover {
+    background: rgba(255,255,255,0.35);
+}
+
+.nav-item.active {
+    background: white;
+    color: #ff6b6b;
+}
+
+/* Stars */
+.header-right {
+    background: rgba(255,255,255,0.25);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    .app-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+
+    </style>
+</head>
+<body>
+
+<header class="app-header">
+    <div class="header-left">
+        <span class="logo"><a href="books.html">🌟 KiddoLearn Academy</a></span>
+    </div>
+
+    <nav class="header-nav">
+        <button class="nav-item" onclick="selectSubject(this)"><a href="math.html">➕ Math</a></button>
+        <button class="nav-item" onclick="selectSubject(this)"><a href="english.html">🔤 English</a></button>
+        <button class="nav-item active" onclick="selectSubject(this)"><a href="urdu.html">📖 Urdu</a></button>
+    </nav>
+
+    <div class="header-right">
+        ⭐ Stars: <span id="star-count">0</span>
+    </div>
+</header>
+
+<nav id="menu"></nav>
+
+<div id="app-viewport">
+    <div id="content-grid" class="grid"></div>
+    
+    <div id="writing-section" class="hidden">
+        <h2>Trace and Learn</h2>
+        <div id="writing-zone">
+            <canvas id="drawCanvas"></canvas>
+            <div style="margin-top:15px">
+                <button class="nav-btn" onclick="clearCanvas()">Clear Board</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="quiz-section" class="hidden">
+        <div class="quiz-container">
+            <h2 id="q-text">What is this?</h2>
+            <div id="q-options"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    let stars = parseInt(localStorage.getItem("urduStars")) || 0;
+document.getElementById("star-count").innerText = stars;
+
+function addStars(amount = 5) {
+    stars += amount;
+    localStorage.setItem("urduStars", stars);
+    document.getElementById("star-count").innerText = stars;
+}
+
+const phonicsMap = {
+    ا: "ا سے انار",
+    ب: "ب سے بکری",
+    پ: "پ سے پتنگ",
+    ت: "ت سے تتلی",
+    ٹ: "ٹ سے ٹماٹر",
+    ث: "ث سے ثواب",
+    ج: "ج سے جہاز",
+    چ: "چ سے چاند",
+    ح: "ح سے ہاتھ",
+    خ: "خ سے خرگوش",
+    د: "د سے درخت",
+    ڈ: "ڈ سے ڈبہ",
+    ذ: "ذ سے ذہانت",
+    ر: "ر سے ریچھ",
+    ز: "ز سے زیبرا",
+    س: "س سے سیب",
+    ش: "ش سے شیر",
+    ص: "ص سے صوفہ",
+    ض: "ض سے ضرورت",
+    ط: "ط سے طوطا",
+    ظ: "ظ سے ظرف",
+    ع: "ع سے عینک",
+    غ: "غ سے غبارہ",
+    ف: "ف سے فاختہ",
+    ق: "ق سے قلم",
+    ک: "ک سے کتاب",
+    گ: "گ سے گائے",
+    ل: "ل سے لیموں",
+    م: "م سے مچھلی",
+    ن: "ن سے ناریل",
+    و: "و سے وہیل",
+    ہ: "ہ سے ہاتھی",
+    ی: "ی سے یاقوت"
+};
+
+
+    // 1. DATA REPOSITORY (Expandable)
+   const library = {
+    alphabets: ["ا","ب","پ","ت","ٹ","ث","ج","چ","ح","خ","د","ڈ","ذ","ر","ز","س","ش","ص","ض","ط","ظ","ع","غ","ف","ق","ک","گ","ل","م","ن","و","ہ","ی"],
+
+    colors: ["سرخ","نیلا","سبز","پیلا","گلابی","جامنی","نارنجی"],
+
+    days: ["پیر","منگل","بدھ","جمعرات","جمعہ","ہفتہ","اتوار"],
+
+    months: ["جنوری","فروری","مارچ","اپریل","مئی","جون","جولائی","اگست","ستمبر","اکتوبر","نومبر","دسمبر"],
+
+    animals: ["شیر","بکری","گائے","ہاتھی","بلی","کتا","گھوڑا"],
+
+    fruits: ["سیب","کیلا","آم","انگور","سنترہ","اسٹرابیری"],
+
+    vegetables: ["آلو","ٹماٹر","گاجر","پیاز","بھنڈی","مٹر"],
+
+    body: ["سر","آنکھیں","کان","ناک","منہ","ہاتھ","ٹانگیں"]
+};
+
+const urduTitles = {
+  alphabets: "اردو حروف",
+  colors: "رنگ",
+  days: "دن",
+  months: "مہینے",
+  animals: "جانور",
+  fruits: "پھل",
+  vegetables: "سبزیاں",
+  body: "جسم کے حصے"
+};
+
+function selectSubject(btn) {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+
+
+    const menu = document.getElementById('menu');
+    const grid = document.getElementById('content-grid');
+    const writeSec = document.getElementById('writing-section');
+    const quizSec = document.getElementById('quiz-section');
+
+    // 2. GENERATE MENU
+    function init() {
+        Object.keys(library).forEach(cat => {
+            const btn = document.createElement('button');
+            btn.className = 'nav-btn';
+            btn.innerText = urduTitles[cat];
+            btn.onclick = () => showCategory(cat);
+            menu.appendChild(btn);
+        });
+        
+        // Add Quiz and Practice buttons
+        addNavBtn("مشق", showPractice);
+addNavBtn("کوئز", showQuiz);
+
+        
+        showCategory('alphabets'); // Default load
+    }
+
+    function addNavBtn(label, func) {
+        const btn = document.createElement('button');
+        btn.className = 'nav-btn';
+        btn.innerText = label;
+        btn.onclick = func;
+        menu.appendChild(btn);
+    }
+
+    // 3. VOICE & DISPLAY ENGINE
+   function speak(item, category) {
+    let textToSpeak = item;
+
+    if (category === "alphabets") {
+        textToSpeak = phonicsMap[item] || item;
+    }
+
+    const msg = new SpeechSynthesisUtterance(textToSpeak);
+    msg.lang = "ur-PK";   // ✅ Correct Urdu
+    msg.rate = 0.6;
+    msg.pitch = 1.1;
+
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(msg);
+}
+
+const imageMap = {
+
+    // اردو حروف
+    "ا": "🍎", "ب": "🐐", "پ": "🪁", "ت": "🦋", "ٹ": "🍅",
+    "ث": "⭐", "ج": "✈️", "چ": "🌙", "ح": "✋", "خ": "🐇",
+    "د": "🌳", "ڈ": "📦", "ذ": "🧠", "ر": "🐻", "ز": "🦓",
+    "س": "🍎", "ش": "🦁", "ص": "🛋️", "ض": "❗", "ط": "🦜",
+    "ظ": "🍽️", "ع": "👓", "غ": "🎈", "ف": "🕊️", "ق": "✏️",
+    "ک": "📘", "گ": "🐄", "ل": "🍋", "م": "🐟", "ن": "🥥",
+    "و": "🐳", "ہ": "🐘", "ی": "💎",
+
+    // رنگ
+    "سرخ": "🔴",
+    "نیلا": "🔵",
+    "سبز": "🟢",
+    "پیلا": "🟡",
+    "گلابی": "🌸",
+    "جامنی": "🟣",
+    "نارنجی": "🟠",
+
+    // جانور
+    "شیر": "🦁",
+    "بکری": "🐐",
+    "گائے": "🐄",
+    "ہاتھی": "🐘",
+    "بلی": "🐱",
+    "کتا": "🐶",
+    "گھوڑا": "🐎",
+
+    // پھل
+    "سیب": "🍎",
+    "کیلا": "🍌",
+    "آم": "🥭",
+    "انگور": "🍇",
+    "سنترہ": "🍊",
+    "اسٹرابیری": "🍓",
+
+    // سبزیاں
+    "آلو": "🥔",
+    "ٹماٹر": "🍅",
+    "گاجر": "🥕",
+    "پیاز": "🧅",
+    "بھنڈی": "🥬",
+    "مٹر": "🟢",
+
+    // جسم کے حصے
+    "سر": "🙂",
+    "آنکھیں": "👀",
+    "کان": "👂",
+    "ناک": "👃",
+    "منہ": "👄",
+    "ہاتھ": "✋",
+    "ٹانگیں": "🦵",
+
+    // دن
+    "پیر": "📅",
+    "منگل": "📅",
+    "بدھ": "📅",
+    "جمعرات": "📅",
+    "جمعہ": "🕌",
+    "ہفتہ": "📅",
+    "اتوار": "☀️",
+
+    // مہینے
+    "جنوری": "❄️",
+    "فروری": "💨",
+    "مارچ": "🌸",
+    "اپریل": "🌼",
+    "مئی": "🌞",
+    "جون": "🔥",
+    "جولائی": "🌧️",
+    "اگست": "🌦️",
+    "ستمبر": "🍁",
+    "اکتوبر": "🎃",
+    "نومبر": "🍂",
+    "دسمبر": "🎄"
+};
+
+    function showCategory(cat) {
+    resetUI();
+    grid.classList.remove('hidden');
+
+    library[cat].forEach(item => {
+        const card = document.createElement('div');
+        card.className = `card ${cat}`;
+
+
+        const emoji = imageMap[item] || "⭐";
+
+        card.innerHTML = `
+            <div style="font-size:64px">${emoji}</div>
+            <h3>${item}</h3>
+        `;
+
+       card.onclick = () => {
+    speak(item, cat);
+    addStars(2);   // ⭐ +2 stars for learning
+};
+
+
+        grid.appendChild(card);
+    });
+}
+
+
+    function resetUI() {
+        grid.innerHTML = '';
+        grid.classList.add('hidden');
+        writeSec.classList.add('hidden');
+        quizSec.classList.add('hidden');
+    }
+
+    // 4. WRITING CANVAS LOGIC
+    const canvas = document.getElementById('drawCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    function showPractice() {
+        resetUI();
+        writeSec.classList.remove('hidden');
+        canvas.width = Math.min(window.innerWidth - 60, 500);
+        canvas.height = 300;
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#2d3436';
+    }
+
+    canvas.onmousedown = (e) => { drawing = true; ctx.beginPath(); };
+    canvas.onmouseup = () => drawing = false;
+    canvas.onmousemove = (e) => {
+        if(!drawing) return;
+        const rect = canvas.getBoundingClientRect();
+        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        ctx.stroke();
+    };
+    // Touch support
+    canvas.ontouchstart = (e) => { drawing = true; ctx.beginPath(); e.preventDefault(); };
+    canvas.ontouchend = () => drawing = false;
+    canvas.ontouchmove = (e) => {
+        if(!drawing) return;
+        const rect = canvas.getBoundingClientRect();
+        ctx.lineTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+        ctx.stroke();
+    };
+
+    function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+    // 5. QUIZ LOGIC
+    function showQuiz() {
+        resetUI();
+        quizSec.classList.remove('hidden');
+        const allItems = [].concat(...Object.values(library));
+        const correct = allItems[Math.floor(Math.random() * allItems.length)];
+        const options = [correct];
+        
+        while(options.length < 4) {
+            let randomItem = allItems[Math.floor(Math.random() * allItems.length)];
+            if(!options.includes(randomItem)) options.push(randomItem);
+        }
+        options.sort(() => Math.random() - 0.5);
+
+        document.getElementById('q-text').innerText = "Click on: " + correct;
+        speak("Find " + correct);
+
+        const optContainer = document.getElementById('q-options');
+        optContainer.innerHTML = '';
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                if (opt === correct) {
+    speak("شاباش! بہت اچھا");
+    addStars(10);   // ⭐ +10 stars for quiz
+    showQuiz();
+}
+
+                 else {
+                    speak("درست جواب منتخب کریں");
+
+                }
+            };
+            optContainer.appendChild(btn);
+        });
+    }
+
+    init();
+
+
+    function showPractice() {
+    resetUI();
+    writeSec.classList.remove('hidden');
+    canvas.width = Math.min(window.innerWidth - 60, 500);
+    canvas.height = 300;
+
+    addStars(1); // ⭐ reward for practice
+}
+
+</script>
+</body>
+</html>
