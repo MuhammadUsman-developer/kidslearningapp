@@ -299,6 +299,17 @@
     <button class="nav-item" onclick="startLearn('counting')">🔢<br>Count</button>
 </div>
 
+    <div id="tables-section" class="section">
+    <h2 style="text-align:center">Multiplication Tables</h2>
+
+    <div id="table-buttons" class="menu-grid"></div>
+
+    <div id="table-output" class="math-card" style="display:none">
+        <h2 id="table-title"></h2>
+        <div id="table-list" style="font-size:1.4rem; line-height:2"></div>
+    </div>
+</div>
+
 <script>
     let stars = 0;
     let currentAns = 0;
@@ -421,7 +432,71 @@ function selectSubject(btn) {
         const canvas = document.getElementById('writingCanvas');
         canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
     }
+
+    // Tables Section
+function startLearn(type) {
+
+    // COUNTING (already exists)
+    if(type === 'counting') {
+        const grid = document.getElementById('counting-grid');
+        grid.innerHTML = '';
+        for(let i=1; i<=100; i++) {
+            let d = document.createElement('div');
+            d.className = 'num-btn';
+            d.style.padding = '10px';
+            d.innerText = i;
+            d.onclick = () => speak(i);
+            grid.appendChild(d);
+        }
+        showPage('counting-section');
+    }
+
+    // ✖️ TABLES (FIXED)
+    else if(type === 'tables') {
+        showPage('tables-section');
+
+        const btnBox = document.getElementById('table-buttons');
+        const output = document.getElementById('table-output');
+
+        btnBox.innerHTML = '';
+        output.style.display = 'none';
+
+        for(let i=2; i<=20; i++) {
+            let btn = document.createElement('div');
+            btn.className = 'menu-item times';
+            btn.innerHTML = `<div class="icon-circle" style="background:#FFE0B2">✖️</div>Table ${i}`;
+            btn.onclick = () => showTable(i);
+            btnBox.appendChild(btn);
+        }
+    }
+
+    // ✏️ WRITING
+    else if(type === 'writing') {
+        showPage('writing-section');
+        initCanvas();
+    }
+}
+
+function showTable(num) {
+    const title = document.getElementById('table-title');
+    const list = document.getElementById('table-list');
+    const output = document.getElementById('table-output');
+
+    title.innerText = `Table of ${num}`;
+    list.innerHTML = '';
+
+    for(let i=1; i<=10; i++) {
+        let line = document.createElement('div');
+        line.innerText = `${num} × ${i} = ${num*i}`;
+        line.onclick = () => speak(`${num} times ${i} equals ${num*i}`);
+        list.appendChild(line);
+    }
+
+    output.style.display = 'block';
+    speak(`Table of ${num}`);
+}
 </script>
 </body>
 
 </html>
+
